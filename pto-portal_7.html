@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PTO Request Portal</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --blue-50:#E6F1FB;--blue-100:#B5D4F4;--blue-400:#378ADD;--blue-600:#185FA5;--blue-800:#0C447C;
+  --green-50:#EAF3DE;--green-100:#C0DD97;--green-600:#3B6D11;--green-800:#27500A;
+  --amber-50:#FAEEDA;--amber-100:#FAC775;--amber-600:#854F0B;
+  --red-50:#FCEBEB;--red-100:#F7C1C1;--red-600:#A32D2D;--red-800:#791F1F;
+  --border:#e0ddd6;--bg:#fff;--bg2:#f7f6f2;--bg3:#f0efe9;
+  --text:#1a1a1a;--text2:#6b6965;--text3:#9b9894;
+  --r-md:8px;--r-lg:12px;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:100vh}
+.app{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+.hdr{text-align:center;margin-bottom:2rem}
+.hdr h1{font-size:24px;font-weight:600}
+.hdr p{font-size:14px;color:var(--text2);margin-top:5px}
+/* ── Stepper ── */
+.stepper{display:flex;align-items:center;margin-bottom:1.5rem}
+.si{display:flex;flex-direction:column;align-items:center;flex:1}
+.sc{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;border:2px solid var(--border);background:var(--bg);color:var(--text2)}
+.sc.active{background:var(--blue-600);color:#fff;border-color:var(--blue-600)}
+.sc.done{background:var(--green-600);color:#fff;border-color:var(--green-600)}
+.sc.locked{opacity:.45}
+.sl{font-size:11px;color:var(--text2);margin-top:6px;text-align:center;max-width:82px;line-height:1.3}
+.sl.active{color:var(--blue-600);font-weight:600}
+.sl.locked{opacity:.45}
+.scon{flex:1;height:2px;background:var(--border);margin-bottom:24px}
+.scon.done{background:var(--green-600)}
+/* ── Progress ── */
+.prog-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;margin-bottom:1rem}
+.pb-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px}
+.pb-row strong{color:var(--text);font-weight:600}
+.pb-track{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.pb-fill{height:7px;background:var(--blue-600);border-radius:4px;transition:width .4s}
+.chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.chip{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.chip.done{background:var(--green-50);color:var(--green-600)}
+.chip.active{background:var(--blue-50);color:var(--blue-600)}
+.chip.todo{background:var(--bg2);color:var(--text2)}
+/* ── Cards ── */
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1rem}
+.card h2{font-size:17px;font-weight:600}
+.sub{font-size:13px;color:var(--text2);margin-top:4px;margin-bottom:1.25rem;line-height:1.5}
+/* ── Form ── */
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-md);font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue-400)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--r-md);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);transition:background .12s}
+.btn:hover{background:var(--bg2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.pri{background:var(--blue-600);color:#fff;border-color:var(--blue-600)}
+.btn.pri:hover:not(:disabled){background:var(--blue-800)}
+.btn.appr{background:var(--green-600);color:#fff;border-color:var(--green-600)}
+.btn.appr:hover{background:var(--green-800)}
+.btn.dny{background:var(--red-600);color:#fff;border-color:var(--red-600)}
+.btn.dny:hover{background:var(--red-800)}
+.btn-row{display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+/* ── Badges ── */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.bp{background:var(--amber-50);color:var(--amber-600)}
+.ba{background:var(--green-50);color:var(--green-600)}
+.bd{background:var(--red-50);color:var(--red-600)}
+/* ── Request rows ── */
+.stitle{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 6px}
+.rrow{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.rrow:last-of-type{border-bottom:none}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.ri{flex:1;min-width:0}
+.rn{font-size:14px;font-weight:600}
+.rd{font-size:12px;color:var(--text2);margin-top:2px}
+.tp{font-size:11px;padding:2px 9px;border-radius:10px;display:inline-block;margin-top:4px;font-weight:500}
+.ra{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.abtns{display:flex;gap:5px}
+.dexp{background:var(--bg2);border-radius:var(--r-md);padding:12px;margin-top:6px;border:1px solid var(--border)}
+.dexp label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px}
+.dexp textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:var(--font);resize:none;height:70px;background:var(--bg);color:var(--text);outline:none}
+.dexp textarea:focus{border-color:var(--blue-400)}
+.deny-btns{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
+/* ── Toasts / banners ── */
+.toast{background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--green-600);margin-bottom:1rem;display:flex;align-items:center;gap:8px;font-weight:500}
+.warn{background:var(--amber-50);border:1px solid var(--amber-100);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--amber-600);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.err-msg{background:var(--red-50);border:1px solid var(--red-100);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--red-600);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+/* ── Loader ── */
+.loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:2rem;color:var(--text2);font-size:13px}
+.spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--blue-600);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── Manager bar ── */
+.mgr-bar{background:var(--bg2);border-radius:var(--r-md);padding:8px 14px;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.mgr-bar span{font-size:13px;color:var(--text2)}
+/* ── iSolved ── */
+.ibox{background:var(--bg2);border-radius:var(--r-md);padding:1rem 1.25rem;margin:1rem 0;border:1px solid var(--border)}
+.ibox h3{font-size:14px;font-weight:600;margin-bottom:5px}
+.ibox p{font-size:13px;color:var(--text2);line-height:1.6}
+.crow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+.crow:last-child{border-bottom:none}
+/* ── Completion ── */
+.complete-box{text-align:center;padding:2rem 1rem}
+.canvas-wrap{width:100%;height:160px;overflow:hidden;border-radius:var(--r-md);background:var(--bg2);margin-bottom:1.5rem}
+canvas#fw{width:100%;height:100%}
+.complete-icon{width:72px;height:72px;border-radius:50%;background:var(--green-50);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+/* ── Empty / hint ── */
+.empty{text-align:center;padding:2rem;color:var(--text2);font-size:13px}
+.hint{font-size:11px;color:var(--text2);margin-top:.875rem;padding:8px 12px;background:var(--bg3);border-radius:var(--r-md);line-height:1.6}
+/* ── Calendar ── */
+.calwrap{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-top:1.25rem}
+.cal-tl{font-size:15px;font-weight:600;margin-bottom:3px}
+.cal-sb{font-size:12px;color:var(--text2);margin-bottom:1rem}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:1rem}
+.li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.ld{width:12px;height:12px;border-radius:3px}
+.cal-hdr{display:flex;align-items:center;gap:10px;margin-bottom:.75rem}
+.cnav{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:5px 12px;cursor:pointer;font-size:14px;color:var(--text);font-family:var(--font)}
+.cnav:hover{background:var(--bg2)}
+.cmonth{font-size:15px;font-weight:600;flex:1}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cdl{text-align:center;font-size:11px;color:var(--text2);padding:4px 0;font-weight:600;text-transform:uppercase}
+.cday{min-height:62px;border-radius:6px;padding:4px 5px;border:1px solid transparent;background:var(--bg)}
+.cday.today{border-color:var(--blue-400)}
+.cday.other{opacity:.28}
+.cdn{font-size:11px;color:var(--text2);font-weight:500}
+.cev{font-size:10px;padding:2px 5px;border-radius:3px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5;font-weight:600}
+/* ── Setup notice ── */
+.setup-notice{background:var(--amber-50);border:1px solid var(--amber-100);border-radius:var(--r-lg);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.setup-notice h3{font-size:15px;font-weight:600;color:var(--amber-600);margin-bottom:8px}
+.setup-notice p{font-size:13px;color:var(--amber-600);line-height:1.6;margin-bottom:6px}
+.setup-notice code{background:rgba(0,0,0,.06);padding:1px 6px;border-radius:4px;font-size:12px;font-family:monospace}
+@media(max-width:520px){.row2{grid-template-columns:1fr}.abtns{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <h1><i class="ti ti-calendar-heart" style="font-size:22px;vertical-align:-4px;margin-right:8px;color:#185FA5"></i>PTO Request Portal</h1>
+    <p>Submit, approve, and track team time off</p>
+  </div>
+
+  <div class="stepper" id="stepper"></div>
+  <div id="progress"></div>
+  <div id="content"></div>
+</div>
+
+<script>
+// ── CONFIGURATION — replace with your deployed Apps Script URL ──
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwosKBBtscRV6FtMLJuiRiRtO1XboY665W6QCo0HvngylOxn231A_B3S_WcNzcQXb2V/exec";
+// ───────────────────────────────────────────────────────────────
+
+var TEAMS = {
+  IN:   { label:"IN Team",      fill:"#B5D4F4", text:"#0C447C", dot:"#378ADD" },
+  GA:   { label:"GA Team",      fill:"#FAC775", text:"#633806", dot:"#EF9F27" },
+  UTIL: { label:"Utility Team", fill:"#C0DD97", text:"#27500A", dot:"#639922" }
+};
+var STEPS = [
+  { n:1, l:"Submit Request" },
+  { n:2, l:"Manager Review" },
+  { n:3, l:"Submit to iSolved" }
+];
+
+var step = 1;
+var completedSteps = new Set();
+var toast = "";
+var denyOpen = null;
+var calY = new Date().getFullYear();
+var calM = new Date().getMonth();
+var mgrUser = null;
+var mgrName = "";
+var mgrLoginErr = "";
+var fwFired = false;
+var allRequests = [];
+var loadingRequests = false;
+
+// ── Check if URL is configured ──────────────────────────────
+if (SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbwosKBBtscRV6FtMLJuiRiRtO1XboY665W6QCo0HvngylOxn231A_B3S_WcNzcQXb2V/exec") {
+  document.getElementById("setup-notice").style.display = "none";
+}
+
+function ini(n){ return n.trim().split(" ").map(function(w){return w[0]}).join("").toUpperCase().slice(0,2); }
+function fmt(s){ return s ? new Date(s+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : ""; }
+function fmtS(s){ return s ? new Date(s+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}) : ""; }
+
+// ── API call wrapper ─────────────────────────────────────────
+function api(payload, cb) {
+  if (SCRIPT_URL === "YOUR_APPS_SCRIPT_URL_HERE") {
+    cb({ success:false, error:"SCRIPT_URL not configured. See setup-notice." });
+    return;
+  }
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){ cb(data); })
+  .catch(function(err){ cb({ success:false, error: err.message }); });
+}
+
+// ── Navigation ───────────────────────────────────────────────
+function go(s) { step=s; toast=""; denyOpen=null; draw(); }
+
+function draw() {
+  drawStepper();
+  drawProgress();
+  var el = document.getElementById("content");
+  if (step === 1) el.innerHTML = p1();
+  else if (step === 2) { el.innerHTML = loadingHTML("Loading requests…"); loadRequests(); }
+  else el.innerHTML = p3();
+  if (step === 3 && completedSteps.has(3) && !fwFired) { setTimeout(launchFW, 120); }
+}
+
+function loadingHTML(msg) {
+  return '<div class="loading"><div class="spin"></div>' + (msg||"Loading…") + '</div>';
+}
+
+// ── Step 1 ───────────────────────────────────────────────────
+function p1() {
+  return '<div class="card">' +
+    '<h2><i class="ti ti-send" style="font-size:16px;vertical-align:-3px;margin-right:7px;color:#185FA5"></i>Submit a PTO Request</h2>' +
+    '<p class="sub">Fill out the form below. Your manager will be notified immediately by email.</p>' +
+    '<div class="field"><label>Full name</label><input type="text" id="fn" placeholder="Your full name"></div>' +
+    '<div class="field"><label>Team</label><select id="ft"><option value="">Select your team…</option><option value="IN">IN Team</option><option value="GA">GA Team</option><option value="UTIL">Utility Team</option></select></div>' +
+    '<div class="row2">' +
+      '<div class="field"><label>Start date</label><input type="date" id="fs"></div>' +
+      '<div class="field"><label>End date</label><input type="date" id="fe"></div>' +
+    '</div>' +
+    '<div class="field"><label>Notes (optional)</label><textarea rows="3" id="fno" style="resize:none" placeholder="Any context for your manager…"></textarea></div>' +
+    '<div class="btn-row"><button class="btn pri" id="submit-btn" onclick="submitReq()"><i class="ti ti-send"></i> Submit &amp; alert manager</button></div>' +
+    '</div>';
+}
+
+// ── Step 2 ───────────────────────────────────────────────────
+function loadRequests() {
+  fetch(SCRIPT_URL + "?action=getRequests")
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.success) { allRequests = data.requests; }
+      document.getElementById("content").innerHTML = p2();
+    })
+    .catch(function(err){
+      document.getElementById("content").innerHTML =
+        '<div class="err-msg"><i class="ti ti-alert-circle"></i>Could not load requests: ' + err.message + '</div>' + p2Login();
+    });
+}
+
+function p2() {
+  if (!mgrUser) return p2Login();
+  var pending  = allRequests.filter(function(r){ return r.status === "pending"; });
+  var approved = allRequests.filter(function(r){ return r.status === "approved"; });
+  var denied   = allRequests.filter(function(r){ return r.status === "denied"; });
+  var h = "";
+
+  h += '<div class="mgr-bar"><span>Signed in as <strong>' + mgrName + '</strong></span>' +
+    '<button class="btn" style="padding:4px 10px;font-size:12px" onclick="mgrLogout()"><i class="ti ti-logout"></i> Sign out</button></div>';
+  if (toast) h += '<div class="toast"><i class="ti ti-circle-check"></i>' + toast + '</div>';
+
+  h += '<div class="card"><h2><i class="ti ti-shield-check" style="font-size:16px;vertical-align:-3px;margin-right:7px;color:#185FA5"></i>Manager Review</h2>' +
+    '<p class="sub">Approve or deny requests. Approved PTO appears on the calendar below instantly.</p>';
+
+  if (!pending.length && !approved.length && !denied.length) {
+    h += '<p class="empty"><i class="ti ti-inbox" style="font-size:28px;display:block;margin:0 auto 8px;color:#6b6965"></i>No requests submitted yet</p>';
+  }
+
+  if (pending.length) {
+    h += '<div class="stitle">Pending</div>';
+    pending.forEach(function(r) {
+      var t = TEAMS[r.team] || TEAMS.IN;
+      h += '<div class="rrow">' +
+        '<div class="av" style="background:' + t.fill + ';color:' + t.text + '">' + ini(r.name) + '</div>' +
+        '<div class="ri">' +
+          '<div class="rn">' + r.name + '</div>' +
+          '<div class="rd"><i class="ti ti-calendar" style="font-size:12px;vertical-align:-1px"></i> ' + fmt(r.start) + ' &ndash; ' + fmt(r.end) + '</div>' +
+          '<span class="tp" style="background:' + t.fill + ';color:' + t.text + '">' + t.label + '</span>' +
+        '</div>' +
+        '<div class="ra"><span class="badge bp">Pending</span>' +
+          '<div class="abtns">' +
+            '<button class="btn appr" style="padding:5px 11px;font-size:12px" onclick="approveReq(\'' + r.id + '\')"><i class="ti ti-check"></i> Approve</button>' +
+            '<button class="btn dny"  style="padding:5px 11px;font-size:12px" onclick="toggleDeny(\'' + r.id + '\')"><i class="ti ti-x"></i> Deny</button>' +
+          '</div></div></div>';
+      if (denyOpen === r.id) {
+        h += '<div class="dexp"><label>Reason for denial</label>' +
+          '<textarea id="dr_' + r.id + '" placeholder="Explain why this request cannot be approved…"></textarea>' +
+          '<div class="deny-btns">' +
+            '<button class="btn" style="font-size:12px;padding:5px 11px" onclick="toggleDeny(null)">Cancel</button>' +
+            '<button class="btn dny" style="font-size:12px;padding:5px 11px" onclick="denyReq(\'' + r.id + '\')">Confirm denial</button>' +
+          '</div></div>';
+      }
+    });
+  }
+
+  if (approved.length) {
+    h += '<div class="stitle" style="margin-top:1.25rem">Approved</div>';
+    approved.forEach(function(r) {
+      var t = TEAMS[r.team] || TEAMS.IN;
+      h += '<div class="rrow">' +
+        '<div class="av" style="background:' + t.fill + ';color:' + t.text + '">' + ini(r.name) + '</div>' +
+        '<div class="ri"><div class="rn">' + r.name + '</div><div class="rd">' + fmt(r.start) + ' &ndash; ' + fmt(r.end) + '</div>' +
+        '<span class="tp" style="background:' + t.fill + ';color:' + t.text + '">' + t.label + '</span></div>' +
+        '<span class="badge ba">Approved</span></div>';
+    });
+  }
+
+  if (denied.length) {
+    h += '<div class="stitle" style="margin-top:1.25rem">Denied</div>';
+    denied.forEach(function(r) {
+      var t = TEAMS[r.team] || TEAMS.IN;
+      h += '<div class="rrow">' +
+        '<div class="av" style="background:' + t.fill + ';color:' + t.text + '">' + ini(r.name) + '</div>' +
+        '<div class="ri"><div class="rn">' + r.name + '</div><div class="rd">' + fmt(r.start) + ' &ndash; ' + fmt(r.end) + '</div>' +
+        (r.reason ? '<div style="font-size:11px;color:#6b6965;margin-top:2px;font-style:italic">&ldquo;' + r.reason + '&rdquo;</div>' : '') +
+        '<span class="tp" style="background:' + t.fill + ';color:' + t.text + '">' + t.label + '</span></div>' +
+        '<span class="badge bd">Denied</span></div>';
+    });
+  }
+
+  var allReviewed = pending.length === 0 && (approved.length + denied.length) > 0;
+  h += '<div class="btn-row">' +
+    '<button class="btn" onclick="go(1)"><i class="ti ti-arrow-left"></i> Back</button>' +
+    (allReviewed
+      ? '<button class="btn pri" onclick="completeStep2()">Done &mdash; proceed to iSolved <i class="ti ti-arrow-right"></i></button>'
+      : '<span style="font-size:12px;color:var(--text2)">Review all requests to continue</span>') +
+    '</div></div>';
+
+  h += calHTML();
+  return h;
+}
+
+function p2Login() {
+  return '<div class="card"><h2><i class="ti ti-lock" style="font-size:16px;vertical-align:-3px;margin-right:7px;color:#185FA5"></i>Manager login required</h2>' +
+    '<p class="sub">This step is restricted to managers. Enter your credentials to review requests.</p>' +
+    '<div style="max-width:360px;margin:0 auto">' +
+      '<div class="field"><label>Username</label><input type="text" id="lu" placeholder="Your manager username"></div>' +
+      '<div class="field"><label>Password</label><input type="password" id="lp" placeholder="Your password" onkeydown="if(event.key===\'Enter\')mgrLogin()"></div>' +
+      (mgrLoginErr ? '<div class="err-msg" style="margin-bottom:.75rem"><i class="ti ti-alert-circle"></i>' + mgrLoginErr + '</div>' : '') +
+      '<div class="btn-row" style="justify-content:flex-start"><button class="btn pri" onclick="mgrLogin()"><i class="ti ti-login"></i> Sign in</button></div>' +
+      '<div class="hint">Credentials are set in <strong>Code.gs</strong> under <code>MANAGER_CREDENTIALS</code>.</div>' +
+    '</div></div>';
+}
+
+// ── Step 3 ───────────────────────────────────────────────────
+function p3() {
+  var approved = allRequests.filter(function(r){ return r.status === "approved"; });
+  if (completedSteps.has(3)) {
+    return '<div class="card"><div class="complete-box">' +
+      '<div class="canvas-wrap"><canvas id="fw"></canvas></div>' +
+      '<div class="complete-icon"><i class="ti ti-circle-check" style="font-size:34px;color:#3B6D11"></i></div>' +
+      '<p style="font-size:20px;font-weight:600;margin-bottom:8px">All steps complete!</p>' +
+      '<p style="font-size:14px;color:#6b6965;margin-bottom:1.5rem;max-width:340px;margin-left:auto;margin-right:auto;line-height:1.6">Your PTO has been submitted to HR through iSolved. Enjoy your time off!</p>' +
+      '<button class="btn pri" onclick="resetAll()"><i class="ti ti-plus"></i> Submit another request</button>' +
+      '</div></div>';
+  }
+  var canComplete = completedSteps.has(2) && approved.length > 0;
+  var h = "";
+  if (!completedSteps.has(2)) {
+    h += '<div class="warn"><i class="ti ti-lock"></i>Step 2 must be completed by a manager before submitting to iSolved.</div>';
+  }
+  h += '<div class="card"><h2><i class="ti ti-building" style="font-size:16px;vertical-align:-3px;margin-right:7px;color:#185FA5"></i>Submit to HR via iSolved</h2>' +
+    '<p class="sub">Formally record approved PTO in iSolved for HR and payroll.</p>' +
+    '<div class="ibox"><h3>How to submit in iSolved</h3>' +
+    '<p>Log in &rarr; Employee Self-Service &rarr; Time Off &rarr; New Request. Enter the approved dates below, then return here and mark as submitted.</p></div>';
+  if (!approved.length) {
+    h += '<p class="empty">No approved requests yet. Complete step 2 first.</p>';
+  } else {
+    approved.forEach(function(r) {
+      var t = TEAMS[r.team] || TEAMS.IN;
+      h += '<div class="crow"><i class="ti ti-circle-check" style="color:#3B6D11;font-size:18px"></i>' +
+        '<span style="flex:1"><strong>' + r.name + '</strong> <span style="color:#6b6965;font-size:13px">&middot; ' + fmt(r.start) + ' &ndash; ' + fmt(r.end) + '</span></span>' +
+        '<span class="tp" style="background:' + t.fill + ';color:' + t.text + '">' + t.label + '</span></div>';
+    });
+  }
+  h += '<div class="btn-row">' +
+    '<button class="btn" onclick="go(2)"><i class="ti ti-arrow-left"></i> Back</button>' +
+    '<a href="https://myisolved.isolved.com" target="_blank" rel="noopener" style="text-decoration:none"><button class="btn"><i class="ti ti-external-link"></i> Open iSolved</button></a>' +
+    (canComplete
+      ? '<button class="btn pri" onclick="completeStep3()"><i class="ti ti-check"></i> Mark as submitted</button>'
+      : '<span style="font-size:12px;color:var(--text2)">Complete step 2 first</span>') +
+    '</div></div>';
+  return h;
+}
+
+// ── Calendar ─────────────────────────────────────────────────
+function calHTML() {
+  var MN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var approved = allRequests.filter(function(r){ return r.status === "approved"; });
+  var first = new Date(calY, calM, 1).getDay();
+  var days  = new Date(calY, calM+1, 0).getDate();
+  var today = new Date();
+  var cells = "";
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(function(d){ cells += '<div class="cdl">' + d + '</div>'; });
+  for (var i=0; i<first; i++) {
+    var pv = new Date(calY, calM, i-first+1);
+    cells += '<div class="cday other"><div class="cdn">' + pv.getDate() + '</div></div>';
+  }
+  for (var d=1; d<=days; d++) {
+    var isT = today.getFullYear()===calY && today.getMonth()===calM && today.getDate()===d;
+    var ds = calY + "-" + String(calM+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+    var evs = "";
+    approved.forEach(function(r) {
+      if (ds >= r.start && ds <= r.end) {
+        var t = TEAMS[r.team] || TEAMS.IN;
+        evs += '<div class="cev" style="background:' + t.fill + ';color:' + t.text + '">' + r.name.split(" ")[0] + ' &ndash; PTO</div>';
+      }
+    });
+    cells += '<div class="cday' + (isT?" today":"") + '"><div class="cdn">' + d + '</div>' + evs + '</div>';
+  }
+  var rem = (7-(first+days)%7)%7;
+  for (var j=1; j<=rem; j++) cells += '<div class="cday other"><div class="cdn">' + j + '</div></div>';
+
+  return '<div class="calwrap">' +
+    '<div class="cal-tl"><i class="ti ti-calendar-month" style="font-size:15px;vertical-align:-2px;margin-right:6px;color:#185FA5"></i>Team Vacation Calendar</div>' +
+    '<p class="cal-sb">Approved PTO updates here automatically when managers approve requests</p>' +
+    '<div class="legend">' + Object.keys(TEAMS).map(function(k){ var t=TEAMS[k]; return '<div class="li"><div class="ld" style="background:'+t.dot+'"></div>'+t.label+'</div>'; }).join("") + '</div>' +
+    '<div class="cal-hdr">' +
+      '<button class="cnav" onclick="calM--;if(calM<0){calM=11;calY--;}draw()">&lsaquo;</button>' +
+      '<span class="cmonth">' + MN[calM] + ' ' + calY + '</span>' +
+      '<button class="cnav" onclick="calM++;if(calM>11){calM=0;calY++;}draw()">&rsaquo;</button>' +
+    '</div>' +
+    '<div class="cgrid">' + cells + '</div></div>';
+}
+
+// ── Stepper / Progress ───────────────────────────────────────
+function drawStepper() {
+  var el = document.getElementById("stepper"); el.innerHTML = "";
+  STEPS.forEach(function(s, i) {
+    var done = completedSteps.has(s.n), active = s.n === step;
+    var locked = s.n > 1 && !completedSteps.has(s.n-1) && !active;
+    el.innerHTML += '<div class="si"><div class="sc ' + (done?"done":active?"active":locked?"locked":"") + '">' +
+      (done ? '<i class="ti ti-check"></i>' : locked ? '<i class="ti ti-lock"></i>' : s.n) +
+      '</div><div class="sl ' + (active?"active":locked?"locked":"") + '">' + s.l + '</div></div>';
+    if (i < 2) el.innerHTML += '<div class="scon ' + (done?"done":"") + '"></div>';
+  });
+}
+
+function drawProgress() {
+  var pct = Math.round((completedSteps.size / 3) * 100);
+  var chips = STEPS.map(function(s) {
+    var done = completedSteps.has(s.n), active = s.n === step;
+    return '<span class="chip ' + (done?"done":active?"active":"todo") + '">' +
+      '<i class="ti ' + (done?"ti-circle-check":active?"ti-circle-dot":"ti-circle") + '"></i>' + s.l + '</span>';
+  }).join("");
+  document.getElementById("progress").innerHTML =
+    '<div class="prog-card">' +
+    '<div class="pb-row"><span>Process completion</span><strong>' + pct + '%</strong></div>' +
+    '<div class="pb-track"><div class="pb-fill" style="width:' + pct + '%"></div></div>' +
+    '<div class="chips">' + chips + '</div></div>';
+}
+
+// ── Actions ──────────────────────────────────────────────────
+function submitReq() {
+  var name  = document.getElementById("fn").value.trim();
+  var team  = document.getElementById("ft").value;
+  var start = document.getElementById("fs").value;
+  var end   = document.getElementById("fe").value;
+  var notes = document.getElementById("fno").value.trim();
+  if (!name||!team||!start||!end) { alert("Please fill in all required fields."); return; }
+  if (end < start) { alert("End date must be on or after start date."); return; }
+  var btn = document.getElementById("submit-btn");
+  btn.disabled = true; btn.innerHTML = '<div class="spin" style="border-top-color:#fff"></div> Submitting…';
+  api({ action:"submitRequest", name:name, team:team, start:start, end:end, notes:notes }, function(res) {
+    if (res.success) {
+      completedSteps.add(1);
+      toast = "Request submitted! Manager alert sent for " + name + " (" + fmtS(start) + " &ndash; " + fmtS(end) + ")";
+      step = 2; draw();
+    } else {
+      btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Submit &amp; alert manager';
+      alert("Error: " + res.error);
+    }
+  });
+}
+
+function mgrLogin() {
+  var u = document.getElementById("lu").value.trim().toLowerCase();
+  var p = document.getElementById("lp").value;
+  api({ action:"managerLogin", username:u, password:p }, function(res) {
+    if (res.success) {
+      mgrUser = u; mgrName = res.name; mgrLoginErr = "";
+      document.getElementById("content").innerHTML = loadingHTML("Loading requests…");
+      loadRequests();
+    } else {
+      mgrLoginErr = res.error || "Invalid credentials.";
+      document.getElementById("content").innerHTML = p2Login();
+    }
+  });
+}
+function mgrLogout() { mgrUser = null; mgrName = ""; draw(); }
+
+function approveReq(id) {
+  api({ action:"approveRequest", id:id, username:mgrUser, password:getStoredPass() }, function(res) {
+    if (res.success) {
+      allRequests.forEach(function(r){ if(r.id===id) r.status="approved"; });
+      toast = "Request approved and added to the calendar.";
+      denyOpen = null;
+      document.getElementById("content").innerHTML = p2();
+    } else { alert("Error: " + res.error); }
+  });
+}
+
+function toggleDeny(id) { denyOpen = (denyOpen === id ? null : id); document.getElementById("content").innerHTML = p2(); }
+
+function denyReq(id) {
+  var el = document.getElementById("dr_" + id);
+  var reason = el ? el.value.trim() : "";
+  if (!reason) { alert("Please provide a reason for the denial."); return; }
+  api({ action:"denyRequest", id:id, username:mgrUser, password:getStoredPass(), reason:reason }, function(res) {
+    if (res.success) {
+      allRequests.forEach(function(r){ if(r.id===id){ r.status="denied"; r.reason=reason; } });
+      toast = "Request denied.";
+      denyOpen = null;
+      document.getElementById("content").innerHTML = p2();
+    } else { alert("Error: " + res.error); }
+  });
+}
+
+// Store password temporarily in session for approve/deny calls
+var _mgr_pass = "";
+function mgrLoginWithPass(u, p) { _mgr_pass = p; }
+function getStoredPass() { return _mgr_pass; }
+
+// Override mgrLogin to also store pass
+var _origMgrLogin = mgrLogin;
+mgrLogin = function() {
+  var u = document.getElementById("lu").value.trim().toLowerCase();
+  var p = document.getElementById("lp").value;
+  _mgr_pass = p;
+  api({ action:"managerLogin", username:u, password:p }, function(res) {
+    if (res.success) {
+      mgrUser = u; mgrName = res.name; mgrLoginErr = "";
+      document.getElementById("content").innerHTML = loadingHTML("Loading requests…");
+      loadRequests();
+    } else {
+      mgrLoginErr = res.error || "Invalid credentials.";
+      document.getElementById("content").innerHTML = p2Login();
+    }
+  });
+};
+
+function completeStep2() { completedSteps.add(2); step = 3; toast = ""; draw(); }
+function completeStep3() { completedSteps.add(3); fwFired = false; draw(); }
+function resetAll() { completedSteps = new Set(); step = 1; toast = ""; denyOpen = null; fwFired = false; allRequests = []; draw(); }
+
+// ── Fireworks ─────────────────────────────────────────────────
+function launchFW() {
+  var canvas = document.getElementById("fw");
+  if (!canvas) return;
+  fwFired = true;
+  var ctx = canvas.getContext("2d");
+  canvas.width = canvas.offsetWidth || 600;
+  canvas.height = canvas.offsetHeight || 160;
+  var W = canvas.width, H = canvas.height;
+  var colors = ["#378ADD","#3B6D11","#EF9F27","#D85A30","#7F77DD","#1D9E75","#D4537E","#185FA5"];
+  var particles = [], bursts = 0;
+  function burst(x,y){ for(var i=0;i<45;i++){ var a=Math.random()*Math.PI*2,sp=1.5+Math.random()*3.5; particles.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,color:colors[Math.floor(Math.random()*colors.length)],r:2+Math.random()*2.5}); } }
+  var iv = setInterval(function(){ burst(W*(.15+Math.random()*.7), H*(.1+Math.random()*.7)); bursts++; if(bursts>=7) clearInterval(iv); }, 280);
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    particles = particles.filter(function(p){ return p.life>0; });
+    particles.forEach(function(p){ p.x+=p.vx; p.y+=p.vy; p.vy+=.06; p.life-=.016; ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); });
+    ctx.globalAlpha=1;
+    if(bursts<7||particles.length>0) requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// ── Init ─────────────────────────────────────────────────────
+draw();
+</script>
+</body>
+</html>
