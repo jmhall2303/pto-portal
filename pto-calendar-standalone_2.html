@@ -133,7 +133,7 @@ var mgrName = "";
 var mgrPass = "";
 var mgrErr = "";
 
-if (SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbwi8NsCAcajwFcQrK9FQgEYeJzyV1cMXZFMf8p5Qy5-hXyamgveFBcH-2qzhlOek3Ho/exec") {
+if (SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE") {
   document.getElementById("setup-notice").style.display = "none";
 }
 
@@ -166,7 +166,7 @@ function renderCal() {
 }
 
 function fetchEntries(manual) {
-  if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwi8NsCAcajwFcQrK9FQgEYeJzyV1cMXZFMf8p5Qy5-hXyamgveFBcH-2qzhlOek3Ho/exec") {
+  if (SCRIPT_URL === "YOUR_APPS_SCRIPT_URL_HERE") {
     document.getElementById("last-updated").textContent = "Setup required — see notice above.";
     return;
   }
@@ -250,7 +250,7 @@ function renderMgrArea() {
 function mgrLogin() {
   var u = document.getElementById("lu").value.trim().toLowerCase();
   var p = document.getElementById("lp").value;
-  if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwi8NsCAcajwFcQrK9FQgEYeJzyV1cMXZFMf8p5Qy5-hXyamgveFBcH-2qzhlOek3Ho/exec") { mgrErr = "SCRIPT_URL not configured."; renderMgrArea(); return; }
+  if (SCRIPT_URL === "YOUR_APPS_SCRIPT_URL_HERE") { mgrErr = "SCRIPT_URL not configured."; renderMgrArea(); return; }
   fetch(SCRIPT_URL, { method:"POST", body: JSON.stringify({ action:"managerLogin", username:u, password:p }) })
     .then(function(r){ return r.json(); })
     .then(function(res) {
